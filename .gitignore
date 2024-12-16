@@ -1,0 +1,10 @@
+*.exe
+*.exp
+*.ilk
+*.lib
+*.pdb
+
+bin/
+
+_corral
+_repos
