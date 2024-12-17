@@ -13,7 +13,7 @@ class Ray[T: FloatingPoint[T] val]
         origin = origin'
         direction = direction'.normalize()?
     
-    fun pointAt(t: T): Vector3[T] =>
+    fun box pointAt(t: T): Vector3[T] =>
         """
         Get a point along the ray.
         """
