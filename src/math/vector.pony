@@ -1,72 +1,57 @@
-class Vector3[T: FloatingPoint[T] val]
-    """
-    A collection of 'x', 'y', and 'z' components 
-    with defined mathematical operations of a 
-    vector in R3. 
+// Use tuples to represent vectors, because this is more performant than classes.
+type Vector2 is (F32, F32)
+type Vector3 is (F32, F32, F32)
+type Vector4 is (F32, F32, F32, F32)
 
-    Can represent a vector or a coordinate.
-    """
+// Define operations on vectors.
+primitive VectorMath
+    fun add(a: Vector3, b: Vector3): Vector3 =>
+        """
+        Perform the vector addition (a + b).
+        """
+        (a._1 + b._1, a._2 + b._2, a._3 + b._3)
 
-    let x: T
-    let y: T
-    let z: T
+    fun sub(a: Vector3, b: Vector3): Vector3 =>
+        """
+        Perform the vector subtraction (a - b).
+        """
+        (a._1 - b._1, a._2 - b._2, a._3 - b._3)
 
-    new create(x': T, y': T, z': T) =>
+    fun scale(a: Vector3, scalar: F32): Vector3 =>
         """
-        Create a new Vector3 from x, y, and z components.
+        Scale the vector 'a' by a set amount.
         """
-        x = consume x'
-        y = consume y'
-        z = consume z'
+        (a._1 * scalar, a._2 * scalar, a._3 * scalar)
 
-    fun box add(other: Vector3[T] box): Vector3[T] =>
+    fun dot(a: Vector3, b: Vector3): F32 =>
         """
-        Perform vector addition and return the result.
+        Get the result of the dot product (a * b).
         """
-        Vector3[T](x + other.x, y + other.y, z + other.z)
+        (a._1 * b._1) + (a._2 * b._2) + (a._3 * b._3)
 
-    fun box sub(other: Vector3[T] box): Vector3[T] =>
+    fun cross(a: Vector3, b: Vector3): Vector3 =>
         """
-        Perform vector subrtraction and return the result.
+        Get the result of the cross product (a x b).
         """
-        Vector3[T](x - other.x, y - other.y, z - other.z)
-
-    fun box scale(scalar: T): Vector3[T] =>
-        """
-        Perform scalar multiplication and return the result.
-        """
-        Vector3[T](x * scalar, y * scalar, z * scalar)
-
-    fun box neg(): Vector3[T] =>
-        scale(T.from[I8](I8(-1)))
-
-    fun box dot(other: Vector3[T] box): T =>
-        """
-        Perform (this * other) and return the result.
-        """
-        (x * other.x)+ (y * other.y) + (z * other.z)
-
-    fun box cross(other: Vector3[T] box): Vector3[T] =>
-        """
-        Perform (this x other) and return the result.
-        """
-        Vector3[T](
-            (y * other.z) - (z * other.y),
-            (z * other.x) - (x * other.z),
-            (x * other.y) - (y * other.x)
+        (
+            (a._2 * b._3) - (a._3 * b._2),
+            (a._3 * b._1) - (a._1 * b._3),
+            (a._1 * b._2) - (a._2 * b._1)
         )
 
-    fun box magnitude(): T =>
+    fun magnitude(a: Vector3): F32 =>
         """
-        Get the length of the vector.
+        Get the magnitude (length) of the vector 'a'.
         """
-        ((x*x) + (y*y) + (z*z)).sqrt()
+        (a._1.powi(2) + a._2.powi(2) + a._3.powi(2)).sqrt()
 
-    fun box normalize(): Vector3[T]? =>
+    fun normalize(a: Vector3): Vector3? =>
         """
-        Get a unit vector pointing in the same direction as this one.
+        Get the normalized version of the vector 'a'.
 
-        Throws an error if the magnitude of the vector being normalized is 0.
+        Throws an error if the magnitude of 'a' is 0.
         """
-        let len = magnitude()
-        if len == T.from[I8](I8(0)) then error else scale(T.from[I8](I8(1)) / len) end
+        let len: F32 = magnitude(a)
+        if len == 0 then error else scale(a, 1/len) end
+
+    // TODO: Define operations for Vector2 and Vector4, and for conversions...
