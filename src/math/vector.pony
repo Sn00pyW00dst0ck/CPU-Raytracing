@@ -37,6 +37,9 @@ class Vector3[T: FloatingPoint[T] val]
         """
         Vector3[T](x * scalar, y * scalar, z * scalar)
 
+    fun box neg(): Vector3[T] =>
+        scale(T.from[I8](I8(-1)))
+
     fun box dot(other: Vector3[T] box): T =>
         """
         Perform (this * other) and return the result.

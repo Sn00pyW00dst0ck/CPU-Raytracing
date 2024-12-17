@@ -1,5 +1,6 @@
 use "../math"
 
+// Define camera projection modes using a closed world type
 primitive Orthographic
 primitive Perspective
 type CameraProjectionMode is (Orthographic | Perspective)
@@ -12,6 +13,7 @@ class Camera
     let origin: Vector3[F64]
     let look_at: Vector3[F64]
     let up: Vector3[F64]
+    let _direction: Vector3[F64]
     let _horizontal: Vector3[F64]
     let _vertical: Vector3[F64]
     let _lower_left_corner: Vector3[F64]
@@ -30,6 +32,7 @@ class Camera
         origin = origin'
         look_at = look_at'
         up = up'
+        _direction = (look_at - origin).normalize()?
         projection_mode = Orthographic
 
         // Camera basis vectors
@@ -41,7 +44,6 @@ class Camera
         _horizontal = u.scale(width)
         _vertical = v.scale(height)
         _lower_left_corner = origin - _horizontal.scale(1/2.0) - _vertical.scale(1/2.0)
-
     
     new perspective(
         origin': Vector3[F64], 
@@ -56,6 +58,7 @@ class Camera
         origin = origin'
         look_at = look_at'
         up = up'
+        _direction = (look_at - origin).normalize()?
         projection_mode = Perspective
 
         // Camera basis vectors
@@ -71,5 +74,13 @@ class Camera
         _vertical = v.scale(viewport_height)
         _lower_left_corner = origin - _horizontal.scale(1/2.0) - _vertical.scale(1/2.0) - w
 
-
-
+    fun ref get_ray(s: F64, t: F64): Ray[F64]? =>
+        """
+        Generate a ray from the camera through a screen point (s, t).
+        """
+        match projection_mode
+        | Perspective =>
+            Ray[F64](origin, _lower_left_corner + _horizontal.scale(s) + _vertical.scale(t) + -origin)?
+        | Orthographic =>
+            Ray[F64](_lower_left_corner + _horizontal.scale(s) + _vertical.scale(t), - _direction)?
+        end
