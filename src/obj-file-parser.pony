@@ -42,3 +42,5 @@ actor ObjFileParser
         else
             env.err.print("Error opening file '" + path.path + "'")
         end
+
+        // TODO: HOW TO NOTIFY ON DONE?!
