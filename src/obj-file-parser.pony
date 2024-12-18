@@ -1,4 +1,5 @@
 use "files"
+use "promises"
 
 use "./math"
 
@@ -13,9 +14,11 @@ actor ObjFileParser
     let faces: Array[((I32, I32, I32), (I32, I32, I32), (I32, I32, I32))] = Array[((I32, I32, I32), (I32, I32, I32), (I32, I32, I32))](100)
         """The faces array holds indices into the vertices, normals, and tex_coords arrays respectively."""
 
-    be apply(env: Env, path: FilePath) =>
+    be apply(path: FilePath, promise: Promise[Any]) =>
         """
         Parse the OBJ file at the given FilePath.
+
+        When done, will fulfill the provided promise so that the caller can perform some action after completion.
         """
         match OpenFile(path)
         | let file: File =>
@@ -36,11 +39,14 @@ actor ObjFileParser
                         """Ignore anything not starting with these characters"""
                     end
                 else
-                    env.err.print("Error parsing line!")
+                    """If we reach this location, there was an error parsing the line."""
+                    promise.reject()
                 end
             end
         else
-            env.err.print("Error opening file '" + path.path + "'")
+            """If we reach this location, there was an error opening the file."""
+            promise.reject()
         end
 
-        // TODO: HOW TO NOTIFY ON DONE?!
+        // Notify that we have parsed
+        promise((vertices, normals, tex_coords, faces))

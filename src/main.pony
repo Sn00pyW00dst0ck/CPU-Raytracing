@@ -1,4 +1,5 @@
 use "files"
+use "promises"
 
 actor Main
 
@@ -7,7 +8,16 @@ actor Main
         env.out.print("Hello World")
         
         let path = FilePath(FileAuth(env.root), "../assets/head.obj")
-        ObjFileParser(env, path)
+        let p: Promise[Any] = Promise[Any]
+        p.next[Any](
+            {(value: Any) => 
+                env.out.print("Parsed")
+            },
+            {() => 
+                env.out.print("Error parsing OBJ file.")
+            }
+        )
 
+        ObjFileParser(path, p)
 
 
