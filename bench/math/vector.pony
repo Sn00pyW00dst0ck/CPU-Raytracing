@@ -2,7 +2,11 @@ use "pony_bench"
 
 use "../../src/math"
 
-actor MathBenchmarks is BenchmarkList
+actor VectorBenchmarks is BenchmarkList
+    """
+    Listing of all the benchmarks to run for the Vector Mathematics implementations.
+    """
+    
     fun tag benchmarks(bench: PonyBench) =>
         """
         List out all the benchmarks to run for the mathematics benchmarks.

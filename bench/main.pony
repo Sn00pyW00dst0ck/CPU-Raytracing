@@ -13,7 +13,8 @@ actor Main is BenchmarkList
         PonyBench(env', this)
 
     fun tag benchmarks(bench: PonyBench) =>
-        MathBenchmarks.benchmarks(bench)
+        VectorBenchmarks.benchmarks(bench)
+        RayBenchmarks.benchmarks(bench)
         // bench(_OBJFileParser(env, "head.obj")) // TODO: figure out how to link in the 'env' here because this is a tag function...
 
 class iso _OBJFileParser is AsyncMicroBenchmark
