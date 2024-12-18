@@ -4,3 +4,5 @@ class Scene
 
     Stores all the objects in the scene.
     """
+    new create() => 
+        """"""

@@ -2,24 +2,25 @@ use "files"
 use "promises"
 
 use "./math"
+use "./scene"
 
 actor ObjFileParser
     """
     Parse an OBJ file.
     """
-    // TODO: smarter way to do this...
-    let vertices: Array[Vector3] = Array[Vector3](100)
-    let normals: Array[Vector3] = Array[Vector3](100)
-    let tex_coords: Array[Vector2] = Array[Vector2](100)
-    let faces: Array[((I32, I32, I32), (I32, I32, I32), (I32, I32, I32))] = Array[((I32, I32, I32), (I32, I32, I32), (I32, I32, I32))](100)
-        """The faces array holds indices into the vertices, normals, and tex_coords arrays respectively."""
 
-    be apply(path: FilePath, promise: Promise[Any]) =>
+    be apply(path: FilePath, promise: Promise[Mesh val]) =>
         """
         Parse the OBJ file at the given FilePath.
 
         When done, will fulfill the provided promise so that the caller can perform some action after completion.
         """
+        var vertices: Array[Vector3] iso = Array[Vector3](100)
+        var normals: Array[Vector3] iso = Array[Vector3](100)
+        var tex_coords: Array[Vector2] iso = Array[Vector2](100)
+        var faces: Array[((I32, I32, I32), (I32, I32, I32), (I32, I32, I32))] iso = Array[((I32, I32, I32), (I32, I32, I32), (I32, I32, I32))](100)
+            """The faces array holds indices into the vertices, normals, and tex_coords arrays respectively."""
+
         match OpenFile(path)
         | let file: File =>
             for line in FileLines(file, 1024) do
@@ -49,6 +50,6 @@ actor ObjFileParser
         end
 
         // Notify that we have parsed
-        promise((vertices, normals, tex_coords, faces))
+        promise(Mesh(consume vertices, consume  normals, consume tex_coords, consume faces))
 
 // TODO: figure out benchmarking... If this is relatively slow then we should optimize it to hell and back

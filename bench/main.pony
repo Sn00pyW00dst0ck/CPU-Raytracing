@@ -3,6 +3,7 @@ use "pony_bench"
 use "promises"
 
 use "../src"
+use "../src/scene"
 
 use "./math"
 
@@ -40,9 +41,9 @@ class iso _OBJFileParser is AsyncMicroBenchmark
 
     fun apply(c: AsyncBenchContinue) =>
         // Using type 'Any' is slightly bad, but we don't care about the result here so its fine.
-        let p: Promise[Any] = Promise[Any]
+        let p: Promise[Mesh val] = Promise[Mesh val]
         p.next[Any](
-            {(value: Any) => c.complete() },
+            {(value: Mesh val) => c.complete() },
             {() => c.fail() }
         )
 
