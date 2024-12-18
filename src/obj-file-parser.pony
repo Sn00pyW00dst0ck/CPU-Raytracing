@@ -50,3 +50,5 @@ actor ObjFileParser
 
         // Notify that we have parsed
         promise((vertices, normals, tex_coords, faces))
+
+// TODO: figure out benchmarking... If this is relatively slow then we should optimize it to hell and back

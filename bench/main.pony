@@ -7,29 +7,36 @@ use "../src"
 use "./math"
 
 actor Main is BenchmarkList
-    var env: Env
-    new create(env': Env) =>
-        env = env'
-        PonyBench(env', this)
+    let _env: Env
+
+    new create(env: Env) =>
+        _env = env
+        PonyBench(env, this)
 
     fun tag benchmarks(bench: PonyBench) =>
         VectorBenchmarks.benchmarks(bench)
         RayBenchmarks.benchmarks(bench)
-        // bench(_OBJFileParser(env, "head.obj")) // TODO: figure out how to link in the 'env' here because this is a tag function...
+        custom_benchmarks(bench)
+
+    // A behavior can be called from a 'fun tag', and has access to fields, so use that to setup benchmarks that need 'Env' access
+    be custom_benchmarks(bench: PonyBench) =>
+        bench(_OBJFileParser(_env, "suzanne.obj"))
 
 class iso _OBJFileParser is AsyncMicroBenchmark
     """
     Asynchronous benchmark for the OBJ file parsing process.
     """
+    let _env: Env
     let _file_name: String
     let _path: FilePath
 
     new iso create(env: Env, file_name: String) =>
+        _env = env
         _file_name = file_name
-        _path = FilePath(FileAuth(env.root), "../assets/" + file_name)
+        _path = FilePath(FileAuth(_env.root), "../assets/" + file_name)
 
     fun name(): String =>
-      "ObjFileParser(" + _file_name.string() + ")"
+      "ObjFileParser(\"" + _file_name.string() + "\")"
 
     fun apply(c: AsyncBenchContinue) =>
         // Using type 'Any' is slightly bad, but we don't care about the result here so its fine.
