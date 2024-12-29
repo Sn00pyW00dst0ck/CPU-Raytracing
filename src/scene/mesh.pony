@@ -110,6 +110,3 @@ class val Mesh
         end
 
         triangles = consume tri_list
-
-    fun box intersects(ray: Ray, t_min: F32, t_max: F32): () =>
-        """TODO: Implement Me."""
