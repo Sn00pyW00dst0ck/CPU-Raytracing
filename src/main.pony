@@ -18,6 +18,14 @@ actor Main
                 // Construct scene here
                 // Raytrace here
                 // Write to PNG file here
+                let out_path = FilePath(FileAuth(env.root), "../output/test.ppm")
+                PPMWriter(out_path, 4, 4, 255, 
+                [
+                    (0, 0, 0); (0, 255, 0); (0, 255, 0); (0, 0, 0)
+                    (0, 0, 0); (0, 255, 0); (0, 255, 0); (0, 0, 0)
+                    (0, 0, 0); (0, 0, 0); (0, 0, 0); (0, 0, 0)
+                    (0, 0, 0); (0, 0, 0); (0, 0, 0); (0, 0, 0)
+                ])
             },
             {() => 
                 env.out.print("Error parsing OBJ file.")
