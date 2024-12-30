@@ -1,7 +1,6 @@
 use "files"
 use "buffered"
 
-
 actor PPMWriter
     """
     A PONY actor to write PPM file format images.

@@ -75,7 +75,7 @@ class Camera
         _vertical = VectorMath.scale(v, viewport_height)
         _lower_left_corner = VectorMath.sub(VectorMath.sub(VectorMath.sub(origin, VectorMath.scale(_horizontal, 1/2.0)), VectorMath.scale(_vertical, 1/2.0)), w)
 
-    fun ref get_ray(s: F32, t: F32): Ray? =>
+    fun box get_ray(s: F32, t: F32): Ray? =>
         """
         Generate a ray from the camera through a screen point (s, t).
         """
