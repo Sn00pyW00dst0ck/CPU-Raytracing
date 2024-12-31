@@ -23,7 +23,7 @@ class Scene
         """
         // Get closest intersection point
         let nearest_hit = this._intersect(ray, 0.001, 1_000_000)
-        _env.out.print(nearest_hit._1.string())
+
         // Compute shading at the intersection point (TODO: update to use texture, for now just white if hit)
         if (nearest_hit._1 == true) then
             (255, 255, 255)
@@ -51,10 +51,9 @@ class Scene
         for mesh in meshes.values() do
             let hit_data = mesh.intersects(ray, t_min, t_max)
 
-            match hit_data
-            | (true, _, _, _, _) =>
-                _env.out.print("hi")
-                if (hit_data._2 < nearest_hit._2) then 
+            match hit_data._1
+            | true =>
+                if (hit_data._2 < nearest_hit._2) then
                     nearest_hit = hit_data
                 end
             end

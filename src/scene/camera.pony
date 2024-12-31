@@ -37,7 +37,7 @@ class Camera
         projection_mode = Orthographic
 
         // Camera basis vectors
-        let w: Vector3 = VectorMath.normalize(VectorMath.sub(origin, look_at))?
+        let w: Vector3 = VectorMath.normalize(VectorMath.sub(look_at, origin))?
         let u: Vector3 = VectorMath.normalize(VectorMath.cross(up, w))?
         let v: Vector3 = VectorMath.cross(w, u)
 
@@ -59,7 +59,7 @@ class Camera
         origin = origin'
         look_at = look_at'
         up = up'
-        _direction = VectorMath.normalize(VectorMath.sub(look_at, origin))?
+        _direction = VectorMath.normalize(VectorMath.sub(origin, look_at))?
         projection_mode = Perspective
 
         // Camera basis vectors

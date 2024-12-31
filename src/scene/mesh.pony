@@ -42,8 +42,8 @@ class val Mesh
         for triangle in triangles.values() do
             let hit_data = triangle.intersects(ray, t_min, t_max)
 
-            match hit_data
-            | (true, _, _, _, _) =>
+            match hit_data._1
+            | true =>
                 if (hit_data._2 < nearest_hit._2) then 
                     nearest_hit = hit_data
                 end

@@ -36,36 +36,33 @@ actor Main
                     )?, [value], env)
 
                     // Raytrace
-                    let promise_group = Array[Promise[Array[(U8, U8, U8)] val]]
-                    for group in Range[USize](0, height, 1) do // change step size to give raycasters more work
-                        let p: Promise[Array[(U8, U8, U8)] val] = Promise[Array[(U8, U8, U8)] val]
+                    let promise_group: Array[Promise[(USize, Array[(U8, U8, U8)] val)]] = Array[Promise[(USize, Array[(U8, U8, U8)] val)]]
+                    for group in Range[USize](0, height , 1) do // change step size to give raycasters more work
+                        let p: Promise[(USize, Array[(U8, U8, U8)] val)] = Promise[(USize, Array[(U8, U8, U8)] val)]
                         promise_group.push(p)
-                        Raycaster(group, group + 1, width, world, p)
+                        Raycaster(env, group, group + 1, width, height, world, p)
                     end
 
                     // When all raytracing is done, collect the results into one array and write the result
-                    Promises[Array[(U8, U8, U8)] val].join(promise_group.values())
-                        .next[None]({(data: Array[Array[(U8, U8, U8)] val] val) =>
-                            let pixels: Array[(U8, U8, U8)] iso = recover iso
-                                (Iter[Array[(U8, U8, U8)] val](data.values())
-                                    .flat_map[(U8, U8, U8)]({(d: Array[(U8, U8, U8)] val) => d.values() })
-                                    .collect[Array[(U8, U8, U8)]](Array[(U8, U8, U8)](width * height))) end
+                    Promises[(USize, Array[(U8, U8, U8)] val)].join(promise_group.values())
+                        .next[None]({(data: Array[(USize, Array[(U8, U8, U8)] val)] val) =>
+                            for d in data.values() do
+                                env.out.print(d._1.string()) // shows that they come in out of order
+                            end
+
+                            // TODO: fix the below to sort in addition to flat map...
+                            let pixels: Array[(U8, U8, U8)] iso = 
+                                recover iso
+                                    (Iter[(USize, Array[(U8, U8, U8)] val)](data.values())
+                                        .flat_map[(U8, U8, U8)]({(d: (USize, Array[(U8, U8, U8)] val)) => d._2.values() })
+                                        .collect[Array[(U8, U8, U8)]](Array[(U8, U8, U8)](width * height))) 
+                                end
 
                             let out_path = FilePath(FileAuth(env.root), "../output/result.ppm")
                             PPMWriter(out_path, width.u128(), height.u128(), 255, consume pixels)
                         })
 
                 end
-
-                // Write to PPM file here (demo test file)
-                let out_path = FilePath(FileAuth(env.root), "../output/test.ppm")
-                PPMWriter(out_path, 4, 4, 255, 
-                [
-                    (0, 0, 0); (0, 255, 0); (0, 255, 0); (0, 0, 0)
-                    (0, 0, 0); (0, 255, 0); (0, 255, 0); (0, 0, 0)
-                    (0, 0, 0); (0, 0, 0); (0, 0, 0); (0, 0, 0)
-                    (0, 0, 0); (0, 0, 0); (0, 0, 0); (0, 0, 0)
-                ])
             },
             {() => 
                 env.out.print("Error parsing OBJ file.")
@@ -79,7 +76,7 @@ actor Raycaster
     Worker actor that actually generates rays and calls the ray-triangle intersection algorithms...
     """
 
-    be apply(start_row: USize, end_row: USize, width: USize, scene: Scene val, promise: Promise[Array[(U8, U8, U8)] val]) =>
+    be apply(env: Env, start_row: USize, end_row: USize, width: USize, height: USize, scene: Scene val, promise: Promise[(USize, Array[(U8, U8, U8)] val)]) =>
         """
         A raycaster which will raycast rows from start_row to end_row (not inclusive end row) of size 'width' for the given scene. 
         Pixel color data for the row(s) is placed into the output Array that is resolved by the promise.
@@ -91,7 +88,7 @@ actor Raycaster
         for row in Range[USize](start_row, end_row) do
             for col in Range[USize](0, width) do
                 try 
-                    let ray: Ray = scene.camera.get_ray(row.f32(), col.f32())?
+                    let ray: Ray = scene.camera.get_ray(row.f32() / width.f32(), col.f32() / height.f32())?
                     let color: (U8, U8, U8) = scene.trace(ray)
                     pixels.push(color)
                 else
@@ -100,5 +97,5 @@ actor Raycaster
             end
         end
 
-        promise(consume pixels)
+        promise((start_row, consume pixels))
 
