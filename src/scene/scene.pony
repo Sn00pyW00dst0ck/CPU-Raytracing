@@ -22,7 +22,7 @@ class Scene
         Determine the "color of a ray" based on how it intersects with the scene.
         """
         // Get closest intersection point
-        let nearest_hit = this._intersect(ray, 0.001, 1000000) // TODO: figure out better min and max for 't'
+        let nearest_hit = this._intersect(ray, 0.001, 1_000_000)
         _env.out.print(nearest_hit._1.string())
         // Compute shading at the intersection point (TODO: update to use texture, for now just white if hit)
         if (nearest_hit._1 == true) then
