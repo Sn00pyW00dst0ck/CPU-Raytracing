@@ -153,3 +153,22 @@ class val Mesh
         end
 
         triangles = consume tri_list
+
+    fun box intersects(ray: Ray, t_min: F32, t_max: F32) : (Bool, F32, Vector3, Vector3, (Vector2 | None)) => 
+        """
+        Get the nearest intersection of the ray with the mesh.
+        """
+        var nearest_hit: (Bool, F32, Vector3, Vector3, (Vector2 | None)) = (false, t_max, (0, 0, 0), (0, 0, 0), None)
+
+        for triangle in triangles.values() do
+            let hit_data = triangle.intersects(ray, t_min, t_max)
+
+            match hit_data
+            | (true, _, _, _, _) =>
+                if (hit_data._2 < nearest_hit._2) then 
+                    nearest_hit = hit_data
+                end
+            end
+        end
+
+        nearest_hit
