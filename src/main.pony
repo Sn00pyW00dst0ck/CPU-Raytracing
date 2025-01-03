@@ -4,21 +4,79 @@ use "itertools"
 use "promises"
 
 use "./math"
+use "./parsers"
 use "./scene"
 
 actor Main
 
-    fun tag _raytrace_scene(scene: Scene val): Promise[Array[(U8, U8, U8)] val] =>
+    new create(env: Env) => 
+        """
+        Program entry point.
+        """
+        let width: USize = 1600
+        let height: USize = 1200
+
+        _load_models(FileAuth(env.root), ["suzanne.obj"])
+            .next[Scene val](
+                // The self capture below is a bit weird, but allows me to properlyc all the private member functions of main within the callback.
+                {(meshes: Array[Mesh val] val)? =>
+                    env.out.print("Parsed OBJ files. Constructing scene...")
+                     
+                    Scene(Camera.perspective(
+                        (0, 0, 4),
+                        (0, 0, 0),
+                        (0, 1, 0),
+                        45.0, 
+                        (4.0 / 3.0)
+                    )?, meshes, env)
+                },
+                {()? => 
+                    env.out.print("Error parsing OBJ files.")
+                    error
+                }
+            )
+            .next[None](
+                {(world: Scene val)(self: Main tag = this) =>
+                    env.out.print("Constructed scene. Raytracing...")
+                    
+                    self._raytrace_scene(width, height, world)
+                        .next[None](
+                            {(pixels: Array[(U8, U8, U8)] val) =>
+                                let out_path = FilePath(FileAuth(env.root), "../output/result.ppm")
+                                PPMWriter(out_path, width.u128(), height.u128(), 255, consume pixels)
+                            }
+                        )
+                },
+                {() => 
+                    env.out.print("Error constructing scene from loaded models.")
+                }
+            )
+
+    fun tag _load_models(auth: FileAuth, filenames: Array[String]): Promise[Array[Mesh val] val] =>
+        """
+        Load the given list of models from their filenames. 
+
+        This is an asynchronous operation which will eventually return all the loaded 
+        model's data in the form of Array[Mesh]. There is no gurantee in what order the meshes 
+        are returned. 
+        """
+        let promise_group: Array[Promise[Mesh val]] = Array[Promise[Mesh val]]
+        for name in filenames.values() do
+            let p: Promise[Mesh val] = Promise[Mesh val]
+            promise_group.push(p)
+            ObjFileParser(FilePath(auth, "../assets/" + name), p)
+        end
+
+        Promises[Mesh val].join(promise_group.values())
+    
+    fun tag _raytrace_scene(width: USize, height: USize, scene: Scene val): Promise[Array[(U8, U8, U8)] val] =>
         """
         Raytrace the scene. 
         
         This is an asynchronous operation which will eventually return the pixel data 
         in the form of a Promise. The pixel data is returned row by row, starting with the 
-        top row and ending with the bottom row. 
+        top row and ending with the bottom row.
         """
-        let width: USize = 1600
-        let height: USize = 1200
-
         // Create all the raycaster worker actors to raycast different parts of the scene
         let promise_group: Array[Promise[_RaycasterOutput val]] = Array[Promise[_RaycasterOutput val]]
         for group in Range[USize](0, height , 1) do // increase step size to give raycasters more work
@@ -39,47 +97,6 @@ actor Main
                 consume pixels
             })
 
-
-    new create(env: Env) => 
-        """
-        Program entry point.
-        """
-
-        env.out.print("Hello World")
-        
-        let path = FilePath(FileAuth(env.root), "../assets/suzanne.obj")
-        
-        let p: Promise[Mesh val] = Promise[Mesh val]
-        p.next[Any](
-            {(value: Mesh val)(self: Main tag = this) =>
-                env.out.print("Parsed")
-
-                try 
-                    // Construct scene here
-                    let world: Scene val = Scene(Camera.perspective(
-                        (0, 0, 4),
-                        (0, 0, 0),
-                        (0, 1, 0),
-                        45.0, 
-                        (4.0 / 3.0)
-                    )?, [value], env)
-                    
-                    let width: USize = 1600
-                    let height: USize = 1200
-                    
-                    self._raytrace_scene(world)
-                        .next[None]({(pixels: Array[(U8, U8, U8)] val) =>
-                            let out_path = FilePath(FileAuth(env.root), "../output/result.ppm")
-                            PPMWriter(out_path, width.u128(), height.u128(), 255, consume pixels)
-                        })
-                end
-            },
-            {() => 
-                env.out.print("Error parsing OBJ file.")
-            }
-        )
-
-        ObjFileParser(path, p)
 
 actor Raycaster
     """

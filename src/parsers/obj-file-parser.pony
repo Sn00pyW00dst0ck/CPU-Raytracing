@@ -1,8 +1,8 @@
 use "files"
 use "promises"
 
-use "./math"
-use "./scene"
+use "../math"
+use "../scene"
 
 actor ObjFileParser
     """
