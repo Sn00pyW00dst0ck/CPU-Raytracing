@@ -8,13 +8,42 @@ use "./scene"
 
 actor Main
 
+    fun tag _raytrace_scene(scene: Scene val): Promise[Array[(U8, U8, U8)] val] =>
+        """
+        Raytrace the scene. 
+        
+        This is an asynchronous operation which will eventually return the pixel data 
+        in the form of a Promise. The pixel data is returned row by row, starting with the 
+        top row and ending with the bottom row. 
+        """
+        let width: USize = 1600
+        let height: USize = 1200
+
+        // Create all the raycaster worker actors to raycast different parts of the scene
+        let promise_group: Array[Promise[_RaycasterOutput val]] = Array[Promise[_RaycasterOutput val]]
+        for group in Range[USize](0, height , 1) do // increase step size to give raycasters more work
+            let p: Promise[_RaycasterOutput val] = Promise[_RaycasterOutput val]
+            promise_group.push(p)
+            Raycaster(group, group + 1, width, height, scene, p)
+        end
+
+        // Combine all the raycaster outputs into a pixel data promise
+        Promises[_RaycasterOutput val].join(promise_group.values())
+            .next[Array[(U8, U8, U8)] val]({(data: Array[_RaycasterOutput val] val) =>
+                let pixels: Array[(U8, U8, U8)] iso = 
+                    recover iso
+                        (Iter[_RaycasterOutput val](Sort[Array[_RaycasterOutput val], _RaycasterOutput val](data.clone()).values())
+                            .flat_map[(U8, U8, U8)]({(d: _RaycasterOutput val) => d.data.values() })
+                            .collect[Array[(U8, U8, U8)]](Array[(U8, U8, U8)](width * height))) 
+                    end
+                consume pixels
+            })
+
+
     new create(env: Env) => 
         """
         Program entry point.
         """
-
-        let width: USize = 1600
-        let height: USize = 1200
 
         env.out.print("Hello World")
         
@@ -22,7 +51,7 @@ actor Main
         
         let p: Promise[Mesh val] = Promise[Mesh val]
         p.next[Any](
-            {(value: Mesh val) =>
+            {(value: Mesh val)(self: Main tag = this) =>
                 env.out.print("Parsed")
 
                 try 
@@ -34,31 +63,15 @@ actor Main
                         45.0, 
                         (4.0 / 3.0)
                     )?, [value], env)
-
-                    // Raytrace
-                    let promise_group: Array[Promise[_RaycasterOutput val]] = Array[Promise[_RaycasterOutput val]]
-                    for group in Range[USize](0, height , 1) do // change step size to give raycasters more work
-                        let p: Promise[_RaycasterOutput val] = Promise[_RaycasterOutput val]
-                        promise_group.push(p)
-                        Raycaster(env, group, group + 1, width, height, world, p)
-                    end
-
-                    // When all raytracing is done, collect the results into one array and write the result
-                    Promises[_RaycasterOutput].join(promise_group.values())
-                        .next[None]({(data: Array[_RaycasterOutput val] val) =>
-
-                            // Sort the data and map it into the pixel data for the entire image...
-                            let pixels: Array[(U8, U8, U8)] iso = 
-                                recover iso
-                                    (Iter[_RaycasterOutput val](Sort[Array[_RaycasterOutput val], _RaycasterOutput val](data.clone()).values())
-                                        .flat_map[(U8, U8, U8)]({(d: _RaycasterOutput val) => d.data.values() })
-                                        .collect[Array[(U8, U8, U8)]](Array[(U8, U8, U8)](width * height))) 
-                                end
-
+                    
+                    let width: USize = 1600
+                    let height: USize = 1200
+                    
+                    self._raytrace_scene(world)
+                        .next[None]({(pixels: Array[(U8, U8, U8)] val) =>
                             let out_path = FilePath(FileAuth(env.root), "../output/result.ppm")
                             PPMWriter(out_path, width.u128(), height.u128(), 255, consume pixels)
                         })
-
                 end
             },
             {() => 
@@ -72,8 +85,7 @@ actor Raycaster
     """
     Worker actor that actually generates rays and calls the ray-triangle intersection algorithms...
     """
-
-    be apply(env: Env, start_row: USize, end_row: USize, width: USize, height: USize, scene: Scene val, promise: Promise[_RaycasterOutput val]) =>
+    be apply(start_row: USize, end_row: USize, width: USize, height: USize, scene: Scene val, promise: Promise[_RaycasterOutput val]) =>
         """
         A raycaster which will raycast rows from start_row to end_row (not inclusive end row) of size 'width' for the given scene. 
         Pixel color data for the row(s) is placed into the output Array that is resolved by the promise.
