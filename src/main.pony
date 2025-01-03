@@ -13,8 +13,8 @@ actor Main
         Program entry point.
         """
 
-        let width: USize = 800
-        let height: USize = 600
+        let width: USize = 1600
+        let height: USize = 1200
 
         env.out.print("Hello World")
         
@@ -36,25 +36,22 @@ actor Main
                     )?, [value], env)
 
                     // Raytrace
-                    let promise_group: Array[Promise[(USize, Array[(U8, U8, U8)] val)]] = Array[Promise[(USize, Array[(U8, U8, U8)] val)]]
+                    let promise_group: Array[Promise[_RaycasterOutput val]] = Array[Promise[_RaycasterOutput val]]
                     for group in Range[USize](0, height , 1) do // change step size to give raycasters more work
-                        let p: Promise[(USize, Array[(U8, U8, U8)] val)] = Promise[(USize, Array[(U8, U8, U8)] val)]
+                        let p: Promise[_RaycasterOutput val] = Promise[_RaycasterOutput val]
                         promise_group.push(p)
                         Raycaster(env, group, group + 1, width, height, world, p)
                     end
 
                     // When all raytracing is done, collect the results into one array and write the result
-                    Promises[(USize, Array[(U8, U8, U8)] val)].join(promise_group.values())
-                        .next[None]({(data: Array[(USize, Array[(U8, U8, U8)] val)] val) =>
-                            for d in data.values() do
-                                env.out.print(d._1.string()) // shows that they come in out of order
-                            end
+                    Promises[_RaycasterOutput].join(promise_group.values())
+                        .next[None]({(data: Array[_RaycasterOutput val] val) =>
 
-                            // TODO: fix the below to sort in addition to flat map...
+                            // Sort the data and map it into the pixel data for the entire image...
                             let pixels: Array[(U8, U8, U8)] iso = 
                                 recover iso
-                                    (Iter[(USize, Array[(U8, U8, U8)] val)](data.values())
-                                        .flat_map[(U8, U8, U8)]({(d: (USize, Array[(U8, U8, U8)] val)) => d._2.values() })
+                                    (Iter[_RaycasterOutput val](Sort[Array[_RaycasterOutput val], _RaycasterOutput val](data.clone()).values())
+                                        .flat_map[(U8, U8, U8)]({(d: _RaycasterOutput val) => d.data.values() })
                                         .collect[Array[(U8, U8, U8)]](Array[(U8, U8, U8)](width * height))) 
                                 end
 
@@ -76,7 +73,7 @@ actor Raycaster
     Worker actor that actually generates rays and calls the ray-triangle intersection algorithms...
     """
 
-    be apply(env: Env, start_row: USize, end_row: USize, width: USize, height: USize, scene: Scene val, promise: Promise[(USize, Array[(U8, U8, U8)] val)]) =>
+    be apply(env: Env, start_row: USize, end_row: USize, width: USize, height: USize, scene: Scene val, promise: Promise[_RaycasterOutput val]) =>
         """
         A raycaster which will raycast rows from start_row to end_row (not inclusive end row) of size 'width' for the given scene. 
         Pixel color data for the row(s) is placed into the output Array that is resolved by the promise.
@@ -97,5 +94,26 @@ actor Raycaster
             end
         end
 
-        promise((start_row, consume pixels))
+        promise(_RaycasterOutput(start_row, consume pixels))
 
+class val _RaycasterOutput is Comparable[_RaycasterOutput]
+    """
+    A helper class to represent raycaster output. 
+
+    Would normally use just a tuple, but this is necessary so that we can
+    sort the output of the Raycaster actors to be in the proper order.
+    """
+    let index: USize val
+    let data: Array[(U8, U8, U8)] val
+
+    new val create(index': USize val, data': Array[(U8, U8, U8)] val) =>
+        index = index'
+        data = data'
+
+    // Implement the comparable interface so that they compare via indices.
+
+    fun eq(other: _RaycasterOutput): Bool =>
+        this.index == other.index
+
+    fun lt(other: _RaycasterOutput): Bool =>
+        this.index < other.index
