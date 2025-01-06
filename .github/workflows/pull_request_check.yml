@@ -1,0 +1,39 @@
+# GitHub CI Pull Request Checks
+name: Pull Request Check
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install PONY, Check Build, Unit Test
+      run: |
+        export SHELL=/bin/bash
+        sh -c "$(curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/ponylang/ponyup/latest-release/ponyup-init.sh)"
+        export PATH=/home/runner/.local/share/ponyup/bin:$PATH
+        source ~/.bashrc
+        ponyup default x86_64-linux-ubuntu20.04
+        ponyup update ponyc release
+        export PATH=/home/runner/.local/share/ponyup/ponyc-release-0.58.5-x86_64-linux-ubuntu20.04/bin/ponyc:$PATH
+        source ~/.bashrc
+        ponyup update corral release
+        export PATH=/home/runner/.local/share/ponyup/corral-release-0.8.1-x86_64-linux/bin/corral:$PATH
+        source ~/.bashrc
+        
+        corral update
+
+        cd ./src/server
+        corral run -- ponyc 
+        
+        cd ../../test
+        corral run -- ponyc
+        ./test
