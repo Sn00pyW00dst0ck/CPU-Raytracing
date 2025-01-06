@@ -21,7 +21,7 @@ actor Main
             .flatten_next[Array[Mesh val] val](
                 {(textures: Array[Texture val] val)(self: Main tag = this) =>
                     env.out.print("Loaded textures. Loading OBJ files...")
-                    self._load_models(FileAuth(env.root), ["suzanne.obj"])
+                    self._load_models(FileAuth(env.root), ["suzanne.obj"], textures)
                 },
                 {()? => 
                     env.out.print("Error loading texture files.")
@@ -31,7 +31,6 @@ actor Main
             .next[Scene val](
                 {(meshes: Array[Mesh val] val)? =>
                     env.out.print("Parsed OBJ files. Constructing scene...")
-                     
                     Scene(Camera.perspective(
                         (0, 0, 4),
                         (0, 0, 0),
@@ -85,7 +84,7 @@ actor Main
         Promises[Texture val].join(promise_group.values())
 
 
-    fun tag _load_models(auth: FileAuth, filenames: Array[String]): Promise[Array[Mesh val] val] =>
+    fun tag _load_models(auth: FileAuth, filenames: Array[String], textures: Array[Texture val] val): Promise[Array[Mesh val] val] =>
         """
         Load the given list of models from their filenames. 
 
@@ -97,7 +96,7 @@ actor Main
         for name in filenames.values() do
             let p: Promise[Mesh val] = Promise[Mesh val]
             promise_group.push(p)
-            ObjFileParser(FilePath(auth, "../assets/" + name), p)
+            try ObjFileParser(FilePath(auth, "../assets/" + name), textures(0)?, p) else p.reject() end
         end
 
         Promises[Mesh val].join(promise_group.values())

@@ -9,7 +9,7 @@ actor ObjFileParser
     Parse an OBJ file.
     """
 
-    be apply(path: FilePath, promise: Promise[Mesh val]) =>
+    be apply(path: FilePath, texture: (Texture val | None), promise: Promise[Mesh val]) =>
         """
         Parse the OBJ file at the given FilePath.
 
@@ -50,6 +50,6 @@ actor ObjFileParser
         end
 
         // Notify that we have parsed
-        promise(Mesh(consume vertices, consume  normals, consume tex_coords, consume faces, None))
+        promise(Mesh(consume vertices, consume  normals, consume tex_coords, consume faces, texture))
 
 // TODO: figure out benchmarking... If this is relatively slow then we should optimize it to hell and back

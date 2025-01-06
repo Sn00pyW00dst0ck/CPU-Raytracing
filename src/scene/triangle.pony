@@ -111,7 +111,7 @@ class val Triangle
                 end
 
             // Interpolated texture coordinates (if texture coordinates are available)
-            var tex_coord: (Vector2 | None) = None
+            var tex_coord: (Vector2 | None) = 
                 match (t1, t2, t3)
                 | (let t1_val: Vector2, let t2_val: Vector2, let t3_val: Vector2) =>
                     (
@@ -123,7 +123,12 @@ class val Triangle
                 end
 
             // Return intersection details
-            (true, t, intersection, normal, tex_coord, texture)
+            match tex_coord
+            | let coord: Vector2 =>
+                (true, t, intersection, normal, tex_coord, texture)
+            | None =>
+                (true, t, intersection, normal, None, None)
+            end
         else
             (false, 0.0, (0, 0, 0), (0, 0, 0), None, None)
         end

@@ -23,12 +23,16 @@ class Scene
         """
         // Get closest intersection point
         let nearest_hit = this._intersect(ray, 0.001, 1_000_000)
+        
+        // Handle case of no hit
+        if (nearest_hit._1 == false) then return (0, 0, 0) end
 
-        // Compute shading at the intersection point (TODO: update to use texture, for now just white if hit)
-        if (nearest_hit._1 == true) then
-            (255, 255, 255)
+        // Compute shading at the hit point (TODO: lighting, etc)
+        match (nearest_hit._5, nearest_hit._6)
+        | (let coords: Vector2, let tex: Texture val) =>
+            try tex.sample(coords._1, coords._2)? else (255, 0, 0) end
         else
-            (0, 0, 0)
+            (255, 255, 255)
         end
 
         // TODO: reflections
@@ -45,6 +49,7 @@ class Scene
         - Vector3: Point of intersection.
         - Vector3: Normal at the intersection.
         - Vector2: Texture coordinate at the intersection.
+        - Texture val: Texture used at intersection point (or none if texture coordinate is also none).
         """
         var nearest_hit: (Bool, F32, Vector3, Vector3, (Vector2 | None), (Texture val | None)) = (false, t_max, (0, 0, 0), (0, 0, 0), None, None)
 
