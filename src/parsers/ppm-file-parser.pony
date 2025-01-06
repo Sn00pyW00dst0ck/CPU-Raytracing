@@ -21,7 +21,7 @@ actor PPMFileParser
                 let dimensions: Array[String] = lines.next()?.split()
                 let width: USize = dimensions(0)?.usize()?
                 let height: USize = dimensions(1)?.usize()?
-                let range: U8 = lines.next()?.u8()?
+                let range: U8 = lines.next()?.u8()? //  assuming 255 for now, but in future update this...
 
                 // Read the binary data...
                 let pixels: Array[Array[(U8, U8, U8)] val] iso = Array[Array[(U8, U8, U8)] val](height)
@@ -37,10 +37,19 @@ actor PPMFileParser
                 end
 
                 promise(Texture(consume pixels, width, height))
-            else
-                promise.reject()
+                return
             end
-        else
-            """If we reach this location, there was an error opening the file."""
-            promise.reject()
+        | FileOK =>
+            """A type of error that can occur when opening the file."""
+        | FileEOF =>
+            """A type of error that can occur when opening the file."""
+        | FileBadFileNumber =>
+            """A type of error that can occur when opening the file."""
+        | FileExists =>
+            """A type of error that can occur when opening the file."""
+        | FileError =>
+            """A type of error that can occur when opening the file."""
+        | FilePermissionDenied =>
+            """A type of error that can occur when opening the file."""
         end
+        promise.reject()

@@ -1,5 +1,6 @@
 use "pony_test"
 
+use parser_tests = "./parsers"
 use scene_tests = "./scene"
 
 actor Main is TestList
@@ -7,5 +8,7 @@ actor Main is TestList
 	new make() => None
 
 	fun tag tests(test: PonyTest) =>
-        scene_tests.TriangleTests.make().tests(test)
+        parser_tests.PPMFileParserTests.make().tests(test)
+		scene_tests.TriangleTests.make().tests(test)
+		
         
