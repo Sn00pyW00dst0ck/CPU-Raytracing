@@ -36,7 +36,7 @@ class Scene
 
 
 
-    fun _intersect(ray: Ray, t_min: F32, t_max: F32): (Bool, F32, Vector3, Vector3, (Vector2 | None)) =>
+    fun _intersect(ray: Ray, t_min: F32, t_max: F32): (Bool, F32, Vector3, Vector3, (Vector2 | None), (Texture val | None)) =>
         """
         Find the closest intersection of the ray with any object in the scene.
         Returns:
@@ -46,7 +46,7 @@ class Scene
         - Vector3: Normal at the intersection.
         - Vector2: Texture coordinate at the intersection.
         """
-        var nearest_hit: (Bool, F32, Vector3, Vector3, (Vector2 | None)) = (false, t_max, (0, 0, 0), (0, 0, 0), None)
+        var nearest_hit: (Bool, F32, Vector3, Vector3, (Vector2 | None), (Texture val | None)) = (false, t_max, (0, 0, 0), (0, 0, 0), None, None)
 
         for mesh in meshes.values() do
             let hit_data = mesh.intersects(ray, t_min, t_max)

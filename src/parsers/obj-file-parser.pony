@@ -50,6 +50,6 @@ actor ObjFileParser
         end
 
         // Notify that we have parsed
-        promise(Mesh(consume vertices, consume  normals, consume tex_coords, consume faces))
+        promise(Mesh(consume vertices, consume  normals, consume tex_coords, consume faces, None))
 
 // TODO: figure out benchmarking... If this is relatively slow then we should optimize it to hell and back

@@ -17,11 +17,11 @@ actor PPMFileParser
             try 
                 // Read the header data...
                 let lines: FileLines ref = file.lines()
-                let header: String iso = lines.next()?
+                let header: String iso = lines.next()? // TODO: add support for P3 vs P6 headers
                 let dimensions: Array[String] = lines.next()?.split()
                 let width: USize = dimensions(0)?.usize()?
                 let height: USize = dimensions(1)?.usize()?
-                let range: U8 = lines.next()?.u8()? //  assuming 255 for now, but in future update this...
+                let range: U8 = lines.next()?.u8()? // TODO: assuming 255 for now, but in future update this...
 
                 // Read the binary data...
                 let pixels: Array[Array[(U8, U8, U8)] val] iso = Array[Array[(U8, U8, U8)] val](height)
@@ -36,6 +36,7 @@ actor PPMFileParser
                     pixels.push(consume row)
                 end
 
+                // TODO: ensure width and height are valid for the pixel data that was read.
                 promise(Texture(consume pixels, width, height))
                 return
             end

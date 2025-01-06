@@ -20,10 +20,14 @@ class val Triangle
     let t2: (Vector2 | None)
     let t3: (Vector2 | None)
 
+    // Texture
+    let texture: (Texture val | None)
+
     new val create(
         p1': Vector3, p2': Vector3, p3': Vector3,
         n1': (Vector3 | None), n2': (Vector3 | None), n3': (Vector3 | None),
-        t1': (Vector2 | None), t2': (Vector2 | None), t3': (Vector2 | None)
+        t1': (Vector2 | None), t2': (Vector2 | None), t3': (Vector2 | None),
+        texture': (Texture val | None)
     ) =>
         """
         Create a new triangle...
@@ -40,7 +44,9 @@ class val Triangle
         t2 = t2'
         t3 = t3'
 
-    fun box intersects(ray: Ray, t_min: F32, t_max: F32): (Bool, F32, Vector3, Vector3, (Vector2 | None)) =>
+        texture = texture'
+
+    fun box intersects(ray: Ray, t_min: F32, t_max: F32): (Bool, F32, Vector3, Vector3, (Vector2 | None), (Texture val | None)) =>
         """
         Ray-Triangle intersection...
 
@@ -50,6 +56,7 @@ class val Triangle
          - Vector3: coordinate of the intersection if it exists
          - Vector3: normal at the intersection if it exists (attempts to use barycentric, otherwise does normal of the triangle face)
          - Vector2: texture coordinate at the intersection if it exists (attempts to use barycentric coordinates)
+         - Texture: the texture to use (if texture coordinates are None, then this is also None)
         """
         let edge1 = VectorMath.sub(p2, p1)
         let edge2 = VectorMath.sub(p3, p1)
@@ -57,7 +64,7 @@ class val Triangle
         let a = VectorMath.dot(edge1, h)
 
         if a.abs() < 1e-8 then
-            return (false, 0.0, (0, 0, 0), (0, 0, 0), None)
+            return (false, 0.0, (0, 0, 0), (0, 0, 0), None, None)
         end
 
         let f = 1.0 / a
@@ -65,14 +72,14 @@ class val Triangle
         let u = f * VectorMath.dot(s, h)
 
         if (u < 0.0) or (u > 1.0) then
-            return (false, 0.0, (0, 0, 0), (0, 0, 0), None)
+            return (false, 0.0, (0, 0, 0), (0, 0, 0), None, None)
         end
 
         let q = VectorMath.cross(s, edge1)
         let v = f * VectorMath.dot(ray.direction, q)
 
         if (v < 0.0) or ((u + v) > 1.0) then
-            return (false, 0.0, (0, 0, 0), (0, 0, 0), None)
+            return (false, 0.0, (0, 0, 0), (0, 0, 0), None, None)
         end
 
         let t: F32 = f * VectorMath.dot(edge2, q)
@@ -116,7 +123,7 @@ class val Triangle
                 end
 
             // Return intersection details
-            (true, t, intersection, normal, tex_coord)
+            (true, t, intersection, normal, tex_coord, texture)
         else
-            (false, 0.0, (0, 0, 0), (0, 0, 0), None)
+            (false, 0.0, (0, 0, 0), (0, 0, 0), None, None)
         end

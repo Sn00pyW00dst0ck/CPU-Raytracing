@@ -16,9 +16,19 @@ actor Main
         let width: USize = 1600
         let height: USize = 1200
 
-        _load_models(FileAuth(env.root), ["suzanne.obj"])
+        env.out.print("Loading textures...")
+        _load_textures(FileAuth(env.root), ["bricks.ppm"])
+            .flatten_next[Array[Mesh val] val](
+                {(textures: Array[Texture val] val)(self: Main tag = this) =>
+                    env.out.print("Loaded textures. Loading OBJ files...")
+                    self._load_models(FileAuth(env.root), ["suzanne.obj"])
+                },
+                {()? => 
+                    env.out.print("Error loading texture files.")
+                    error
+                }
+            )
             .next[Scene val](
-                // The self capture below is a bit weird, but allows me to properlyc all the private member functions of main within the callback.
                 {(meshes: Array[Mesh val] val)? =>
                     env.out.print("Parsed OBJ files. Constructing scene...")
                      
@@ -35,22 +45,45 @@ actor Main
                     error
                 }
             )
-            .next[None](
+            .flatten_next[Array[(U8, U8, U8)] val](
                 {(world: Scene val)(self: Main tag = this) =>
                     env.out.print("Constructed scene. Raytracing...")
-                    
                     self._raytrace_scene(width, height, world)
-                        .next[None](
-                            {(pixels: Array[(U8, U8, U8)] val) =>
-                                let out_path = FilePath(FileAuth(env.root), "../output/result.ppm")
-                                PPMWriter(out_path, width.u128(), height.u128(), 255, consume pixels)
-                            }
-                        )
                 },
-                {() => 
+                {()? => 
                     env.out.print("Error constructing scene from loaded models.")
+                    error
                 }
             )
+            .next[None](
+                {(pixels: Array[(U8, U8, U8)] val) =>
+                    env.out.print("Finished raytracing. Writing output to file...")
+                    let out_path = FilePath(FileAuth(env.root), "../output/result.ppm")
+                    PPMWriter(out_path, width.u128(), height.u128(), 255, consume pixels)
+                    env.out.print("Wrote output to file.")
+                },
+                {() => 
+                    env.out.print("Error writing output to file.")
+                }
+            )
+
+    fun tag _load_textures(auth: FileAuth, filenames: Array[String]): Promise[Array[Texture val] val] =>
+        """
+        Load the given list of textures from their filenames. 
+
+        This is an asynchronous operation which will eventually return all the loaded 
+        model's data in the form of Array[Texture val]. There is no gurantee in what order the meshes 
+        are returned. 
+        """
+        let promise_group: Array[Promise[Texture val]] = Array[Promise[Texture val]]
+        for name in filenames.values() do
+            let p: Promise[Texture val] = Promise[Texture val]
+            promise_group.push(p)
+            PPMFileParser(FilePath(auth, "../assets/" + name), p)
+        end
+
+        Promises[Texture val].join(promise_group.values())
+
 
     fun tag _load_models(auth: FileAuth, filenames: Array[String]): Promise[Array[Mesh val] val] =>
         """
