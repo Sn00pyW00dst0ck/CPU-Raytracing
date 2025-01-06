@@ -36,7 +36,7 @@ class iso _TriangleBasicIntersectionTest is UnitTest
 
     fun apply(h: TestHelper) =>
         try 
-            let triangle = Triangle((0, 0, 0), (0, 1, 0), (1, 0, 0), None, None, None, None, None, None)
+            let triangle = Triangle((0, 0, 0), (0, 1, 0), (1, 0, 0), None, None, None, None, None, None, None)
             let ray = Ray((0.5, 0.5, -1), (0, 0, 1))?
             let hit_data = triangle.intersects(ray, 0.01, 1000.0)
             // Ensure hit
@@ -66,7 +66,7 @@ class iso _TriangleNoIntersectionTest is UnitTest
 
     fun apply(h: TestHelper) =>
         try 
-            let triangle = Triangle((0, 0, 0), (0, 1, 0), (1, 0, 0), None, None, None, None, None, None)
+            let triangle = Triangle((0, 0, 0), (0, 1, 0), (1, 0, 0), None, None, None, None, None, None, None)
             let ray = Ray((2, 2, -1), (0, 0, 1))?
             let hit_data = triangle.intersects(ray, 0.01, 1000.0)
             // Ensure no hit
@@ -80,7 +80,7 @@ class iso _TriangleParallelRayIntersectionTest is UnitTest
 
     fun apply(h: TestHelper) =>
         try 
-            let triangle = Triangle((0, 0, 0), (0, 1, 0), (1, 0, 0), None, None, None, None, None, None)
+            let triangle = Triangle((0, 0, 0), (0, 1, 0), (1, 0, 0), None, None, None, None, None, None, None)
             let ray = Ray((0.5, 0.5, -1), (1, 1, 0))?
             let hit_data = triangle.intersects(ray, 0.01, 1000.0)
             // Ensure no hit
@@ -94,7 +94,7 @@ class iso _TriangleIntersectionAtEdgeTest is UnitTest
 
     fun apply(h: TestHelper) =>
         try 
-            let triangle = Triangle((0, 0, 0), (0, 1, 0), (1, 0, 0), None, None, None, None, None, None)
+            let triangle = Triangle((0, 0, 0), (0, 1, 0), (1, 0, 0), None, None, None, None, None, None, None)
             let ray = Ray((0.5, 0.0, -1), (0, 0, 1))?
             let hit_data = triangle.intersects(ray, 0.01, 1000.0)
             // Ensure hit
@@ -124,7 +124,7 @@ class iso _TriangleIntersectionAtVertexTest is UnitTest
 
     fun apply(h: TestHelper) =>
         try 
-            let triangle = Triangle((0, 0, 0), (0, 1, 0), (1, 0, 0), None, None, None, None, None, None)
+            let triangle = Triangle((0, 0, 0), (0, 1, 0), (1, 0, 0), None, None, None, None, None, None, None)
             let ray = Ray((0.0, 0.0, -1), (0, 0, 1))?
             let hit_data = triangle.intersects(ray, 0.01, 1000.0)
             // Ensure hit
@@ -154,7 +154,7 @@ class iso _TriangleIntersectionStartInPlaneTest is UnitTest
 
     fun apply(h: TestHelper) =>
         try 
-            let triangle = Triangle((0, 0, 0), (0, 1, 0), (1, 0, 0), None, None, None, None, None, None)
+            let triangle = Triangle((0, 0, 0), (0, 1, 0), (1, 0, 0), None, None, None, None, None, None, None)
             let ray = Ray((0.25, 0.25, 0), (0, 0, 1))?
             let hit_data = triangle.intersects(ray, 0, 1000.0)
             // Ensure hit
@@ -184,7 +184,7 @@ class iso _TriangleBackfacingIntersectionTest is UnitTest
 
     fun apply(h: TestHelper) =>
         try 
-            let triangle = Triangle((0, 0, 0), (1, 0, 0), (0, 1, 0), None, None, None, None, None, None)
+            let triangle = Triangle((0, 0, 0), (1, 0, 0), (0, 1, 0), None, None, None, None, None, None, None)
             let ray = Ray((0.0, 0.0, -1), (0, 0, 1))?
             let hit_data = triangle.intersects(ray, 0.01, 1000.0)
             // Ensure hit
