@@ -31,9 +31,12 @@ jobs:
         
         corral update
 
-        cd ./src/server
+        cd ./src
         corral run -- ponyc 
-        
-        cd ../../test
+
+        cd ../test
         corral run -- ponyc
         ./test
+
+        cd ../bench
+        corral run -- ponyc
