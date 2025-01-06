@@ -27,7 +27,7 @@ class Scene
         // Handle case of no hit
         if (nearest_hit._1 == false) then return (0, 0, 0) end
 
-        // Compute shading at the hit point (TODO: lighting, etc)
+        // Compute shading at the hit point (TODO: lighting, materials, etc)
         match (nearest_hit._5, nearest_hit._6)
         | (let coords: Vector2, let tex: Texture val) =>
             try tex.sample(coords._1, coords._2)? else (255, 0, 0) end
