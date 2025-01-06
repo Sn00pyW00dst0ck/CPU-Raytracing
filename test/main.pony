@@ -10,5 +10,6 @@ actor Main is TestList
 	fun tag tests(test: PonyTest) =>
         parser_tests.PPMFileParserTests.make().tests(test)
 		scene_tests.TriangleTests.make().tests(test)
+		scene_tests.TextureTests.make().tests(test)
 		
         

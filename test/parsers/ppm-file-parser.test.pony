@@ -77,6 +77,7 @@ class iso _TestLargePPMFile is UnitTest
 			{(texture: Texture val) => 
 				h.assert_eq[USize](24, texture.width)
 				h.assert_eq[USize](25, texture.height)
+				// TODO: add pixel checks...
 				h.complete(true)
 			},
 			{() => 

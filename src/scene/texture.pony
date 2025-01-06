@@ -16,7 +16,11 @@ class val Texture
     fun box sample(u: F32, v: F32): (U8, U8, U8)? =>
         """
         Sample the texture color at UV coordinates (u, v).
+
+        TODO: maybe improve this with some form of interpolation when on edge boundaries / fractional parts
         """
+        if (u < 0) or (v < 0) then error end
+        if (u > 1) or (v > 1) then error end 
         let x = (u * (width - 1).f32()).floor().usize()
         let y = (v * (height - 1).f32()).floor().usize()
         pixels(y)?(x)?

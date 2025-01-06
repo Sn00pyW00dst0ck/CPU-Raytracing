@@ -42,15 +42,15 @@ class iso _TriangleBasicIntersectionTest is UnitTest
             // Ensure hit
             h.assert_true(hit_data._1)
             // Ensure proper distance
-            h.assert_true(_TestHelpers.compareFloats[F32](hit_data._2, 1))
+            h.assert_true(_TriangleTestHelpers.compareFloats[F32](hit_data._2, 1))
             // Ensure the location of intersection is correct
-            h.assert_true(_TestHelpers.compareFloats[F32](hit_data._3._1, 0.5))
-            h.assert_true(_TestHelpers.compareFloats[F32](hit_data._3._2, 0.5))
-            h.assert_true(_TestHelpers.compareFloats[F32](hit_data._3._3, 0.0))
+            h.assert_true(_TriangleTestHelpers.compareFloats[F32](hit_data._3._1, 0.5))
+            h.assert_true(_TriangleTestHelpers.compareFloats[F32](hit_data._3._2, 0.5))
+            h.assert_true(_TriangleTestHelpers.compareFloats[F32](hit_data._3._3, 0.0))
             // Ensure expected normal (0,0,-1)
-            h.assert_true(_TestHelpers.compareFloats[F32](hit_data._4._1, 0.0))
-            h.assert_true(_TestHelpers.compareFloats[F32](hit_data._4._2, 0.0))
-            h.assert_true(_TestHelpers.compareFloats[F32](hit_data._4._3, -1))
+            h.assert_true(_TriangleTestHelpers.compareFloats[F32](hit_data._4._1, 0.0))
+            h.assert_true(_TriangleTestHelpers.compareFloats[F32](hit_data._4._2, 0.0))
+            h.assert_true(_TriangleTestHelpers.compareFloats[F32](hit_data._4._3, -1))
             // Ensure no texture coordinates
             match hit_data._5
             | None => """"""
@@ -100,15 +100,15 @@ class iso _TriangleIntersectionAtEdgeTest is UnitTest
             // Ensure hit
             h.assert_true(hit_data._1)
             // Ensure proper distance
-            h.assert_true(_TestHelpers.compareFloats[F32](hit_data._2, 1))
+            h.assert_true(_TriangleTestHelpers.compareFloats[F32](hit_data._2, 1))
             // Ensure the location of intersection is correct
-            h.assert_true(_TestHelpers.compareFloats[F32](hit_data._3._1, 0.5))
-            h.assert_true(_TestHelpers.compareFloats[F32](hit_data._3._2, 0.0))
-            h.assert_true(_TestHelpers.compareFloats[F32](hit_data._3._3, 0.0))
+            h.assert_true(_TriangleTestHelpers.compareFloats[F32](hit_data._3._1, 0.5))
+            h.assert_true(_TriangleTestHelpers.compareFloats[F32](hit_data._3._2, 0.0))
+            h.assert_true(_TriangleTestHelpers.compareFloats[F32](hit_data._3._3, 0.0))
             // Ensure expected normal (0,0,-1)
-            h.assert_true(_TestHelpers.compareFloats[F32](hit_data._4._1, 0.0))
-            h.assert_true(_TestHelpers.compareFloats[F32](hit_data._4._2, 0.0))
-            h.assert_true(_TestHelpers.compareFloats[F32](hit_data._4._3, -1))
+            h.assert_true(_TriangleTestHelpers.compareFloats[F32](hit_data._4._1, 0.0))
+            h.assert_true(_TriangleTestHelpers.compareFloats[F32](hit_data._4._2, 0.0))
+            h.assert_true(_TriangleTestHelpers.compareFloats[F32](hit_data._4._3, -1))
             // Ensure no texture coordinates
             match hit_data._5
             | None => """"""
@@ -130,15 +130,15 @@ class iso _TriangleIntersectionAtVertexTest is UnitTest
             // Ensure hit
             h.assert_true(hit_data._1)
             // Ensure proper distance
-            h.assert_true(_TestHelpers.compareFloats[F32](hit_data._2, 1))
+            h.assert_true(_TriangleTestHelpers.compareFloats[F32](hit_data._2, 1))
             // Ensure the location of intersection is correct
-            h.assert_true(_TestHelpers.compareFloats[F32](hit_data._3._1, 0.0))
-            h.assert_true(_TestHelpers.compareFloats[F32](hit_data._3._2, 0.0))
-            h.assert_true(_TestHelpers.compareFloats[F32](hit_data._3._3, 0.0))
+            h.assert_true(_TriangleTestHelpers.compareFloats[F32](hit_data._3._1, 0.0))
+            h.assert_true(_TriangleTestHelpers.compareFloats[F32](hit_data._3._2, 0.0))
+            h.assert_true(_TriangleTestHelpers.compareFloats[F32](hit_data._3._3, 0.0))
             // Ensure expected normal (0,0,-1)
-            h.assert_true(_TestHelpers.compareFloats[F32](hit_data._4._1, 0.0))
-            h.assert_true(_TestHelpers.compareFloats[F32](hit_data._4._2, 0.0))
-            h.assert_true(_TestHelpers.compareFloats[F32](hit_data._4._3, -1))
+            h.assert_true(_TriangleTestHelpers.compareFloats[F32](hit_data._4._1, 0.0))
+            h.assert_true(_TriangleTestHelpers.compareFloats[F32](hit_data._4._2, 0.0))
+            h.assert_true(_TriangleTestHelpers.compareFloats[F32](hit_data._4._3, -1))
             // Ensure no texture coordinates
             match hit_data._5
             | None => """"""
@@ -160,15 +160,15 @@ class iso _TriangleIntersectionStartInPlaneTest is UnitTest
             // Ensure hit
             h.assert_true(hit_data._1)
             // Ensure proper distance
-            h.assert_true(_TestHelpers.compareFloats[F32](hit_data._2, 0))
+            h.assert_true(_TriangleTestHelpers.compareFloats[F32](hit_data._2, 0))
             // Ensure the location of intersection is correct
-            h.assert_true(_TestHelpers.compareFloats[F32](hit_data._3._1, 0.25))
-            h.assert_true(_TestHelpers.compareFloats[F32](hit_data._3._2, 0.25))
-            h.assert_true(_TestHelpers.compareFloats[F32](hit_data._3._3, 0.0))
+            h.assert_true(_TriangleTestHelpers.compareFloats[F32](hit_data._3._1, 0.25))
+            h.assert_true(_TriangleTestHelpers.compareFloats[F32](hit_data._3._2, 0.25))
+            h.assert_true(_TriangleTestHelpers.compareFloats[F32](hit_data._3._3, 0.0))
             // Ensure expected normal (0,0,-1)
-            h.assert_true(_TestHelpers.compareFloats[F32](hit_data._4._1, 0.0))
-            h.assert_true(_TestHelpers.compareFloats[F32](hit_data._4._2, 0.0))
-            h.assert_true(_TestHelpers.compareFloats[F32](hit_data._4._3, -1))
+            h.assert_true(_TriangleTestHelpers.compareFloats[F32](hit_data._4._1, 0.0))
+            h.assert_true(_TriangleTestHelpers.compareFloats[F32](hit_data._4._2, 0.0))
+            h.assert_true(_TriangleTestHelpers.compareFloats[F32](hit_data._4._3, -1))
             // Ensure no texture coordinates
             match hit_data._5
             | None => """"""
@@ -190,15 +190,15 @@ class iso _TriangleBackfacingIntersectionTest is UnitTest
             // Ensure hit
             h.assert_true(hit_data._1)
             // Ensure proper distance
-            h.assert_true(_TestHelpers.compareFloats[F32](hit_data._2, 1))
+            h.assert_true(_TriangleTestHelpers.compareFloats[F32](hit_data._2, 1))
             // Ensure the location of intersection is correct
-            h.assert_true(_TestHelpers.compareFloats[F32](hit_data._3._1, 0.0))
-            h.assert_true(_TestHelpers.compareFloats[F32](hit_data._3._2, 0.0))
-            h.assert_true(_TestHelpers.compareFloats[F32](hit_data._3._3, 0.0))
+            h.assert_true(_TriangleTestHelpers.compareFloats[F32](hit_data._3._1, 0.0))
+            h.assert_true(_TriangleTestHelpers.compareFloats[F32](hit_data._3._2, 0.0))
+            h.assert_true(_TriangleTestHelpers.compareFloats[F32](hit_data._3._3, 0.0))
             // Ensure expected normal (0,0,1)
-            h.assert_true(_TestHelpers.compareFloats[F32](hit_data._4._1, 0.0))
-            h.assert_true(_TestHelpers.compareFloats[F32](hit_data._4._2, 0.0))
-            h.assert_true(_TestHelpers.compareFloats[F32](hit_data._4._3, 1))
+            h.assert_true(_TriangleTestHelpers.compareFloats[F32](hit_data._4._1, 0.0))
+            h.assert_true(_TriangleTestHelpers.compareFloats[F32](hit_data._4._2, 0.0))
+            h.assert_true(_TriangleTestHelpers.compareFloats[F32](hit_data._4._3, 1))
             // Ensure no texture coordinates
             match hit_data._5
             | None => """"""
@@ -209,7 +209,7 @@ class iso _TriangleBackfacingIntersectionTest is UnitTest
             h.fail()
         end
 
-primitive _TestHelpers
+primitive _TriangleTestHelpers
     fun compareFloats[A: FloatingPoint[A] val](x: A, y: A, tolerance: A = A.from[F64](0.00001)): Bool =>
         """
         true if two floats are within 'tolerance' of each other, false otherwise.
