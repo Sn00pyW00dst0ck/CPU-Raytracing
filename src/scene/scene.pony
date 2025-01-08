@@ -27,7 +27,7 @@ class Scene
         let nearest_hit = this._intersect(ray, 0.001, 1_000_000)
         
         // Handle case of no hit
-        if (nearest_hit._1 == false) then return (0, 0, 0) end
+        if (nearest_hit._1 == false) then return (0, 0, 80) end
 
         // Get texture color at point of hit
         let base_color: Vector3 = match (nearest_hit._5, nearest_hit._6)
@@ -71,11 +71,20 @@ class Scene
                 final_color = VectorMath.add(final_color, VectorMath.scale(base_color, diffuse))
             end
 
-            // Specular lighting
-
+            // Specular lighting (Blinn-Phong model)
+            try 
+                let view_dir = VectorMath.normalize(VectorMath.sub(camera.origin, nearest_hit._3))?
+                let halfway_dir = VectorMath.normalize(VectorMath.add(light_dir, view_dir))?
+                let spec = VectorMath.dot(nearest_hit._4, halfway_dir).pow(32) // TODO: allow changing specular exponent
+                if spec > 0.0 then
+                    let specular = VectorMath.scale(light.color, light.intensity * spec * 0.5) // TODO: allow changing the constant 0.5 here
+                    final_color = VectorMath.add(final_color, specular)
+                end
+            end
         end
 
         // Return color as (U8, U8, U8)
+        final_color = VectorMath.clamp(final_color, (0, 0, 0), (255, 255, 255))
         (
             (final_color._1).u8(),
             (final_color._2).u8(),

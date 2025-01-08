@@ -54,4 +54,11 @@ primitive VectorMath
         let len: F32 = magnitude(a)
         if len == 0 then error else scale(a, 1/len) end
 
+    fun clamp(v: Vector3, min: Vector3, max: Vector3): Vector3 =>
+        let x = if (v._1 < min._1) then min._1 elseif (v._1 > max._1) then max._1 else v._1 end
+        let y = if (v._2 < min._2) then min._2 elseif (v._2 > max._2) then max._2 else v._2 end
+        let z = if (v._3 < min._3) then min._3 elseif (v._3 > max._3) then max._3 else v._3 end
+
+        (x, y, z)
+
     // TODO: Define operations for Vector2 and Vector4, and for conversions...
