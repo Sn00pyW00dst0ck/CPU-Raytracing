@@ -17,7 +17,7 @@ actor Main
         let height: USize = 1200
 
         env.out.print("Loading textures...")
-        _load_textures(FileAuth(env.root), ["bricks.ppm"])
+        _load_textures(FileAuth(env.root), ["suzanne.ppm"])
             .flatten_next[Array[Mesh val] val](
                 {(textures: Array[Texture val] val)(self: Main tag = this) =>
                     env.out.print("Loaded textures. Loading OBJ files...")
@@ -37,7 +37,9 @@ actor Main
                         (0, 1, 0),
                         45.0, 
                         (4.0 / 3.0)
-                    )?, meshes, env)
+                    )?, meshes, [
+                        Light.point_light((10, 10, 10), (1.0, 1.0, 1.0), 1000, 1.0, 0.1, 0.01)
+                    ], env)
                 },
                 {()? => 
                     env.out.print("Error parsing OBJ files.")

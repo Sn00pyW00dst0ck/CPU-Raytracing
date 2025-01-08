@@ -9,12 +9,14 @@ class Scene
 
     let camera: Camera val
     let meshes: Array[Mesh val] val
+    let lights: Array[Light val] val
     let _env: Env
 
-    new val create(camera': Camera val, meshes': Array[Mesh val] val, env: Env) => 
+    new val create(camera': Camera val, meshes': Array[Mesh val] val, lights': Array[Light val] val, env: Env) => 
         """"""
         camera = camera'
         meshes = meshes'
+        lights = lights'
         _env = env
 
     fun trace(ray: Ray): (U8, U8, U8) =>
@@ -27,16 +29,58 @@ class Scene
         // Handle case of no hit
         if (nearest_hit._1 == false) then return (0, 0, 0) end
 
-        // Compute shading at the hit point (TODO: lighting, materials, etc)
-        match (nearest_hit._5, nearest_hit._6)
+        // Get texture color at point of hit
+        let base_color: Vector3 = match (nearest_hit._5, nearest_hit._6)
         | (let coords: Vector2, let tex: Texture val) =>
-            try tex.sample(coords._1, coords._2)? else (255, 0, 0) end
+            let texture_color: (U8, U8, U8) = try tex.sample(coords._1, coords._2)? else (255, 255, 255) end
+            (texture_color._1.f32() / 255.0, texture_color._2.f32() / 255.0, texture_color._3.f32() / 255.0)
         else
-            (255, 255, 255)
+            (1.0, 1.0, 1.0)
         end
 
-        // TODO: reflections
+        // Ambient lighting
+        var final_color: Vector3 = VectorMath.scale(base_color, 0.9)
 
+        for light in lights.values() do
+            // Calculate direction to light
+            let light_dir: Vector3 = 
+                match light.light_type
+                | Point => 
+                    try VectorMath.normalize(VectorMath.sub(light.position, nearest_hit._3))? else (0, 0, 0) end
+                | Directional =>
+                    match light.direction
+                    | let dir: Vector3 => try VectorMath.normalize(dir)? else (0, 0, 0) end
+                    else
+                        (0, 0, 0)
+                    end
+                else 
+                    (0, 0, 0)
+                end
+
+            // Check for shadows (cast a shadow ray)
+            try 
+                let shadow_ray = Ray(VectorMath.add(nearest_hit._3, VectorMath.scale(nearest_hit._4, 0.001)), light_dir)? 
+                let shadow_hit = this._intersect(shadow_ray, 0.001, 1_000_000)
+                if shadow_hit._1 then continue end // Skip light contribution if in shadow
+            end
+
+            // Diffuse lighting
+            let dot = VectorMath.dot(nearest_hit._4, light_dir)
+            if dot > 0.0 then
+                let diffuse = VectorMath.magnitude(VectorMath.scale(light.color, light.intensity * dot))
+                final_color = VectorMath.add(final_color, VectorMath.scale(base_color, diffuse))
+            end
+
+            // Specular lighting
+
+        end
+
+        // Return color as (U8, U8, U8)
+        (
+            (final_color._1).u8(),
+            (final_color._2).u8(),
+            (final_color._3).u8()
+        )
 
 
 

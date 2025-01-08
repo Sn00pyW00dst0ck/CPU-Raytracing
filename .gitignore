@@ -8,3 +8,9 @@ bin/
 
 _corral
 _repos
+
+src/src
+test/test
+bench/bench
+
+output/*
